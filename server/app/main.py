@@ -1,6 +1,10 @@
 from fastapi import FastAPI
+from app.routes import plant
 
-app = FastAPI()
+app = FastAPI(title="AI Plant Butler Server")
+
+# 라우터 등록
+app.include_router(plant.router, prefix="/plant")
 
 @app.get("/")
 def root():
