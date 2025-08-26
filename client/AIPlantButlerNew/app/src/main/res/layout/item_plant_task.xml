@@ -13,8 +13,8 @@
 
     <ImageView
         android:id="@+id/image_view_plant_photo"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -26,20 +26,30 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:text="내 몬스테라"
+        tools:text="내 몬스테라"
         android:textStyle="bold"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintStart_toEndOf="@id/image_view_plant_photo"
         app:layout_constraintEnd_toStartOf="@id/button_manage_plant"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toTopOf="@id/image_view_plant_photo" />
+
+    <TextView
+        android:id="@+id/text_view_task_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        tools:text="할 일: 물주기"
+        android:textColor="?android:attr/textColorSecondary"
+        app:layout_constraintTop_toBottomOf="@id/text_view_plant_name"
+        app:layout_constraintStart_toEndOf="@id/image_view_plant_photo"
+        app:layout_constraintEnd_toStartOf="@id/button_manage_plant"/>
 
     <ImageButton
         android:id="@+id/button_manage_plant"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/ic_chevron_right"
+        android:src="@drawable/ic_delete"
         android:background="@android:color/transparent"
         app:tint="?attr/colorControlNormal"
         app:layout_constraintEnd_toEndOf="parent"

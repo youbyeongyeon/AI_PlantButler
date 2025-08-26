@@ -19,7 +19,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.LocationServices
@@ -30,33 +29,42 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URL
-import com.bumptech.glide.Glide
 
 // --- 데이터 클래스 정의 ---
-// 사용자가 등록한 식물 정보
-data class Plant(val name: String, val imageUriString: String)
+
+// 할 일 하나를 나타내는 데이터 클래스 (isDone: true=활성화, false=비활성화)
+data class Task(val description: String, var isDone: Boolean = false, var alarmTime: Long? = null)
+
+// 식물 데이터 클래스
+data class Plant(
+    val name: String,
+    val imageUriString: String,
+    val tasks: MutableList<Task> = mutableListOf()
+)
 
 // OpenWeatherMap API 응답을 위한 데이터 클래스들
 data class WeatherResponse(val weather: List<Weather>, val main: Main, val name: String)
 data class Weather(val id: Int, val main: String, val description: String, val icon: String)
 data class Main(val temp: Double)
 
+
 // --- RecyclerView 어댑터 정의 ---
+
 class PlantAdapter(
     private val plantList: List<Plant>,
     private val listener: OnItemClickListener
 ) : RecyclerView.Adapter<PlantAdapter.PlantViewHolder>() {
 
-    // HomeFragment로 클릭 이벤트를 전달하기 위한 인터페이스
     interface OnItemClickListener {
+        fun onItemClick(position: Int)
         fun onDeleteClick(position: Int)
     }
 
-    // 각 아이템 뷰의 UI 요소를 담는 ViewHolder
     class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val plantPhoto: ImageView = itemView.findViewById(R.id.image_view_plant_photo)
         val plantName: TextView = itemView.findViewById(R.id.text_view_plant_name)
         val manageButton: ImageButton = itemView.findViewById(R.id.button_manage_plant)
+        val taskSummary: TextView = itemView.findViewById(R.id.text_view_task_subtitle)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlantViewHolder {
@@ -64,23 +72,24 @@ class PlantAdapter(
         return PlantViewHolder(view)
     }
 
-
-
     override fun onBindViewHolder(holder: PlantViewHolder, position: Int) {
         val plant = plantList[position]
         holder.plantName.text = plant.name
+        holder.plantPhoto.setImageURI(Uri.parse(plant.imageUriString))
 
-        val uri = Uri.parse(plant.imageUriString)
-
-        Glide.with(holder.itemView.context)
-            .load(uri)
-            .into(holder.plantPhoto)
-
-        holder.manageButton.setOnClickListener {
-            listener.onDeleteClick(position)
+        // 체크된(활성화된) 할 일 중에서 가장 첫 번째 것을 찾습니다.
+        val nextCheckedTask = plant.tasks.firstOrNull { it.isDone }
+        if (nextCheckedTask != null) {
+            holder.taskSummary.text = "할 일: ${nextCheckedTask.description}"
+            holder.taskSummary.visibility = View.VISIBLE
+        } else {
+            holder.taskSummary.text = "활성화된 할 일이 없습니다."
+            holder.taskSummary.visibility = View.VISIBLE
         }
-    }
 
+        holder.manageButton.setOnClickListener { listener.onDeleteClick(position) }
+        holder.itemView.setOnClickListener { listener.onItemClick(position) }
+    }
 
     override fun getItemCount() = plantList.size
 }
@@ -88,36 +97,41 @@ class PlantAdapter(
 
 class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
 
-    // --- 멤버 변수 선언 ---
     private val plantList = mutableListOf<Plant>()
     private lateinit var plantAdapter: PlantAdapter
 
-    // 날씨 UI 관련
     private lateinit var textViewTemp: TextView
     private lateinit var textViewWeatherDesc: TextView
     private lateinit var textViewLocation: TextView
     private lateinit var textViewPlantComment: TextView
 
-    // AddPlantActivity에서 결과를 받아오면 실행될 런처
     private val addPlantLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val plantName = result.data?.getStringExtra("plantName")
             val plantImageUri = result.data?.getStringExtra("plantImageUri")
             if (plantName != null && plantImageUri != null) {
-                plantList.add(Plant(plantName, plantImageUri))
+                val newPlant = Plant(plantName, plantImageUri, mutableListOf(Task("물주기"), Task("분갈이 확인")))
+                plantList.add(newPlant)
                 plantAdapter.notifyItemInserted(plantList.size - 1)
-                savePlants() // 변경된 목록을 저장
+                savePlants()
             }
         }
     }
 
-    // 위치 권한 요청 런처
-    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
-        if (isGranted) {
-            fetchLocationAndWeather()
-        } else {
-            textViewPlantComment.text = "위치 권한을 허용해야 날씨 정보를 볼 수 있어요."
+    private val plantDetailLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val position = result.data?.getIntExtra("plantPosition", -1)
+            val plantJson = result.data?.getStringExtra("plantJson")
+            if (position != null && position != -1 && plantJson != null) {
+                plantList[position] = Gson().fromJson(plantJson, Plant::class.java)
+                plantAdapter.notifyItemChanged(position)
+                savePlants()
+            }
         }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        if (isGranted) { fetchLocationAndWeather() } else { textViewPlantComment.text = "위치 권한을 허용해야 날씨 정보를 볼 수 있어요." }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -127,35 +141,34 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // --- UI 요소 연결 ---
         textViewTemp = view.findViewById(R.id.text_view_temp)
         textViewWeatherDesc = view.findViewById(R.id.text_view_weather_desc)
         textViewLocation = view.findViewById(R.id.text_view_location)
         textViewPlantComment = view.findViewById(R.id.text_view_plant_comment)
         val fabAddPlant: FloatingActionButton = view.findViewById(R.id.fab_add_plant)
-        val recyclerViewPlants: RecyclerView = view.findViewById(R.id.recycler_view_plant_tasks) // ID 이름 수정 완료
+        val recyclerViewPlants: RecyclerView = view.findViewById(R.id.recycler_view_plant_tasks)
 
-        // --- 식물 목록 기능 초기화 ---
         loadPlants()
         plantAdapter = PlantAdapter(plantList, this)
         recyclerViewPlants.adapter = plantAdapter
         recyclerViewPlants.layoutManager = LinearLayoutManager(context)
-
-        val dividerItemDecoration = DividerItemDecoration(
-            recyclerViewPlants.context,
-            (recyclerViewPlants.layoutManager as LinearLayoutManager).orientation
-        )
-        recyclerViewPlants.addItemDecoration(dividerItemDecoration)
 
         fabAddPlant.setOnClickListener {
             val intent = Intent(context, AddPlantActivity::class.java)
             addPlantLauncher.launch(intent)
         }
 
-        // --- 날씨 기능 초기화 ---
         checkLocationPermission()
     }
-    // --- PlantAdapter.OnItemClickListener 인터페이스 구현 ---
+
+    override fun onItemClick(position: Int) {
+        val intent = Intent(context, PlantDetailActivity::class.java).apply {
+            putExtra("plantPosition", position)
+            putExtra("plantJson", Gson().toJson(plantList[position]))
+        }
+        plantDetailLauncher.launch(intent)
+    }
+
     override fun onDeleteClick(position: Int) {
         AlertDialog.Builder(requireContext())
             .setTitle("식물 삭제")
@@ -169,7 +182,6 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
             .show()
     }
 
-    // --- 식물 목록 저장/불러오기 함수 ---
     private fun savePlants() {
         val sharedPref = activity?.getSharedPreferences("my_plants", Context.MODE_PRIVATE) ?: return
         val editor = sharedPref.edit()
@@ -182,14 +194,18 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
         val sharedPref = activity?.getSharedPreferences("my_plants", Context.MODE_PRIVATE) ?: return
         val json = sharedPref.getString("plant_list", null)
         if (json != null) {
-            val type = object : TypeToken<MutableList<Plant>>() {}.type
-            val loadedPlants: MutableList<Plant> = Gson().fromJson(json, type)
-            plantList.clear()
-            plantList.addAll(loadedPlants)
+            try {
+                val type = object : TypeToken<MutableList<Plant>>() {}.type
+                val loadedPlants: MutableList<Plant> = Gson().fromJson(json, type)
+                plantList.clear()
+                plantList.addAll(loadedPlants)
+            } catch (e: Exception) {
+                plantList.clear()
+                savePlants()
+            }
         }
     }
 
-    // --- 날씨 관련 함수 ---
     private fun checkLocationPermission() {
         when {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED -> {
@@ -210,7 +226,7 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
                 val lon = location.longitude
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                     try {
-                        val apiKey = "388dcec3097a775ed8a28ff805e223fd" // <--- 이 부분을 본인의 API 키로 꼭 교체하세요!
+                        val apiKey = "388dcec3097a775ed8a28ff805e223fd" // <--- 이 부분을 꼭 확인하세요!
                         val url = "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr"
                         val json = URL(url).readText()
                         val weatherResponse = Gson().fromJson(json, WeatherResponse::class.java)
@@ -225,7 +241,6 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
                     }
                 }
             } else {
-                // 위치를 찾지 못했을 때의 처리 추가
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.Main){
                     textViewPlantComment.text = "위치 정보를 찾을 수 없습니다. GPS를 켜주세요."
                 }

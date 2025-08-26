@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="8dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:background="?attr/selectableItemBackground">
+
+    <CheckBox
+        android:id="@+id/checkbox_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp">
+
+        <TextView
+            android:id="@+id/text_view_task_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="분갈이 하기"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/text_view_alarm_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="오후 03:30 알림"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:textColor="?attr/colorPrimary"/>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/button_delete_task"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_delete"
+        android:background="@android:color/transparent"
+        app:tint="?attr/colorControlNormal"
+        android:contentDescription="할 일 삭제"
+        xmlns:app="http://schemas.android.com/apk/res-auto" />
+</LinearLayout>
