@@ -1,21 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".HomeFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-
-
-</FrameLayout>
-=======
-<LinearLayout
-=======
 <androidx.constraintlayout.widget.ConstraintLayout
->>>>>>> newpop7/main
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -40,10 +24,44 @@
             android:layout_height="wrap_content"
             android:padding="24dp"
             android:background="@drawable/bg_weather_card">
-            <TextView android:id="@+id/text_view_temp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="--°C" android:textSize="48sp" android:textColor="@android:color/white" android:textStyle="bold"/>
-            <TextView android:id="@+id/text_view_weather_desc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/text_view_temp" android:text="날씨 로딩 중..." android:textColor="@android:color/white" android:textSize="18sp"/>
-            <TextView android:id="@+id/text_view_location" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/text_view_weather_desc" android:layout_marginTop="4dp" android:text="위치 찾는 중..." android:drawableStart="@drawable/ic_location" android:drawablePadding="4dp" android:textColor="@android:color/white"/>
-            <TextView android:id="@+id/text_view_plant_comment" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@id/text_view_location" android:layout_marginTop="16dp" android:text="날씨 정보를 바탕으로 식물 관리 팁을 알려드려요." android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/text_view_temp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="--°C"
+                android:textSize="48sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_view_weather_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_view_temp"
+                android:text="날씨 로딩 중..."
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/text_view_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_view_weather_desc"
+                android:layout_marginTop="4dp"
+                android:text="위치 찾는 중..."
+                android:drawableStart="@drawable/ic_location"
+                android:drawablePadding="4dp"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:id="@+id/text_view_plant_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_view_location"
+                android:layout_marginTop="16dp"
+                android:text="날씨 정보를 바탕으로 식물 관리 팁을 알려드려요."
+                android:textColor="@android:color/white" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
@@ -59,18 +77,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_plant_task" />
 
-<<<<<<< HEAD
-</LinearLayout>
->>>>>>> newpop7/main
-=======
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_plant"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
-        android:src="@drawable/ic_add"
+        app:srcCompat="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
->>>>>>> newpop7/main
