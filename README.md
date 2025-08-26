@@ -72,15 +72,3 @@
 - `.gitignore` 설정 예시: Android + Python 통합
 - 프로젝트 관련 자료는 Trello/Notion을 통해 관리
 
-
-## Git Hub 작업방법
-- git checkout <본인 브랜치>
-- git merge main
-- 작업
-- git add .
-- git commit -m "작업내용"
-- git push
-- git checkout main
-- git merge <본인 브랜치>
-- git push
-- server와 client는 동시 작업이 가능하나 server나 client중 하나에서 동시 작업 시 충돌이 날 수 있으므로 main병합 전 협의 후 진행
