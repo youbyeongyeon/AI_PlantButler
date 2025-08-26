@@ -27,7 +27,7 @@
                 android:id="@+id/text_view_temp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="25°C"
+                android:text="--°C"
                 android:textSize="48sp"
                 android:textColor="@android:color/white"
                 android:textStyle="bold"/>
@@ -37,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/text_view_temp"
-                android:text="Sunny"
+                android:text="날씨 로딩 중..."
                 android:textColor="@android:color/white"
                 android:textSize="18sp"/>
 
@@ -47,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/text_view_weather_desc"
                 android:layout_marginTop="4dp"
-                android:text="Cheonan-si"
+                android:text="위치 찾는 중..."
                 android:drawableStart="@drawable/ic_location"
                 android:drawablePadding="4dp"
                 android:textColor="@android:color/white"/>
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/text_view_location"
                 android:layout_marginTop="16dp"
-                android:text="날씨가 맑아 식물들이 좋아해요! ☀️"
+                android:text="날씨 정보를 바탕으로 식물 관리 팁을 알려드려요."
                 android:textColor="@android:color/white"/>
 
         </RelativeLayout>
