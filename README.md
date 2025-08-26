@@ -71,3 +71,30 @@
 ## 기타
 - `.gitignore` 설정 예시: Android + Python 통합
 - 프로젝트 관련 자료는 Trello/Notion을 통해 관리
+
+- !!!!!주의!!!!
+
+  실행이 안될시
+  
+  필수 프로그램 설치 확인 (Android Studio SDK Manager)
+가장 먼저, 새 컴퓨터의 안드로이드 스튜디오에 프로젝트에 필요한 부품들이 모두 설치되었는지 확인해야 합니다.
+
+새 컴퓨터에서 안드로이드 스튜디오를 엽니다.
+
+오른쪽 위 File > Settings (macOS는 Android Studio > Settings)로 들어갑니다.
+
+Languages & Frameworks > Android SDK 메뉴로 이동합니다.
+
+SDK Platforms 탭에서, 우리 프로젝트의 compileSdk 버전에 맞는 Android API 34 (또는 그 이상)가 설치(Installed)되어 있는지 확인합니다. 없다면 체크해서 설치해주세요.
+
+SDK Tools 탭으로 이동하여 아래 항목들이 반드시 체크 및 설치되어 있는지 확인합니다.
+
+Android SDK Build-Tools
+
+Android SDK Command-line Tools
+
+Android Emulator
+
+Android SDK Platform-Tools
+
+
