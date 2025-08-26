@@ -1,31 +1,34 @@
 package com.example.aiplantbutlernew
 
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageButton
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ChatFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ChatFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private val messageList = mutableListOf<Message>()
+    private lateinit var chatAdapter: ChatAdapter
+    private lateinit var recyclerView: RecyclerView
+
+    // 갤러리에서 사진을 선택하면 실행될 콜백
+    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            // 사용자가 선택한 이미지를 메시지 리스트에 추가
+            val message = Message(null, it, VIEW_TYPE_USER_IMAGE)
+            addMessageToList(message)
+            // 가짜 챗봇 응답 (사진 분석)
+            triggerFakeBotResponse(isImageAnalysis = true)
         }
     }
 
@@ -33,27 +36,58 @@ class ChatFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_chat, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ChatFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ChatFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        recyclerView = view.findViewById(R.id.recycler_view_messages)
+        val editTextMessage: EditText = view.findViewById(R.id.edit_text_message)
+        val buttonSend: ImageButton = view.findViewById(R.id.button_send)
+        val buttonAddPhoto: ImageButton = view.findViewById(R.id.button_add_photo)
+
+        // RecyclerView 설정
+        chatAdapter = ChatAdapter(messageList)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = chatAdapter
+
+        // 보내기 버튼 클릭
+        buttonSend.setOnClickListener {
+            val text = editTextMessage.text.toString()
+            if (text.isNotBlank()) {
+                val message = Message(text, null, VIEW_TYPE_USER_TEXT)
+                addMessageToList(message)
+                editTextMessage.text.clear()
+                // 가짜 챗봇 응답 (텍스트)
+                triggerFakeBotResponse(isImageAnalysis = false)
             }
+        }
+
+        // 사진 추가(+) 버튼 클릭
+        buttonAddPhoto.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
+    }
+
+    // 메시지를 리스트에 추가하고 UI를 업데이트하는 함수
+    private fun addMessageToList(message: Message) {
+        messageList.add(message)
+        chatAdapter.notifyItemInserted(messageList.size - 1)
+        recyclerView.scrollToPosition(messageList.size - 1)
+    }
+
+    // 가짜 챗봇 응답을 생성하는 함수
+    private fun triggerFakeBotResponse(isImageAnalysis: Boolean) {
+        // 1.5초 딜레이
+        Handler(Looper.getMainLooper()).postDelayed({
+            val responseText = if (isImageAnalysis) {
+                "사진을 분석 중입니다... 잎이 약간 노란색을 띠는 것 같네요. 과습의 초기 증상일 수 있습니다."
+            } else {
+                "그렇군요! 식물에 대해 더 궁금한 점이 있으신가요?"
+            }
+            val botMessage = Message(responseText, null, VIEW_TYPE_BOT_TEXT)
+            addMessageToList(botMessage)
+        }, 1500)
     }
 }
