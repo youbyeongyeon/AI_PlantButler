@@ -1,41 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:padding="16dp">
+    android:paddingStart="24dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:background="?attr/selectableItemBackground">
 
     <ImageView
-        android:id="@+id/icon_task"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_water_drop" />
+        android:id="@+id/image_view_plant_photo"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:src="@mipmap/ic_launcher_round"/>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/text_view_plant_name"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginStart="16dp">
+        android:layout_marginStart="16dp"
+        tools:text="내 몬스테라"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="?android:attr/textColorPrimary"
+        app:layout_constraintStart_toEndOf="@id/image_view_plant_photo"
+        app:layout_constraintEnd_toStartOf="@id/button_manage_plant"
+        app:layout_constraintTop_toTopOf="@id/image_view_plant_photo" />
 
-        <TextView
-            android:id="@+id/text_view_task_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Water Philodendron"
-            android:textStyle="bold"
-            android:textSize="16sp"/>
+    <TextView
+        android:id="@+id/text_view_task_subtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        tools:text="할 일: 물주기"
+        android:textColor="?android:attr/textColorSecondary"
+        app:layout_constraintTop_toBottomOf="@id/text_view_plant_name"
+        app:layout_constraintStart_toEndOf="@id/image_view_plant_photo"
+        app:layout_constraintEnd_toStartOf="@id/button_manage_plant"/>
 
-        <TextView
-            android:id="@+id/text_view_task_subtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Monstera"/>
-    </LinearLayout>
+    <ImageButton
+        android:id="@+id/button_manage_plant"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_delete"
+        android:background="@android:color/transparent"
+        app:tint="?attr/colorControlNormal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:contentDescription="식물 관리"/>
 
-    <ImageView
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_chevron_right" />
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
