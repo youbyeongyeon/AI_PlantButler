@@ -52,4 +52,6 @@ dependencies {
 // 코루틴 (비동기 네트워크 작업)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
 }
