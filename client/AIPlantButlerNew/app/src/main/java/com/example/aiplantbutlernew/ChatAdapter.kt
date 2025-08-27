@@ -1,5 +1,6 @@
 package com.example.aiplantbutlernew
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class ChatAdapter(private val messageList: MutableList<Message>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ChatAdapter(private var messageList: MutableList<Message>) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     inner class SentTextViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val messageText: TextView = itemView.findViewById(R.id.text_view_message)
@@ -56,12 +57,22 @@ class ChatAdapter(private val messageList: MutableList<Message>) : RecyclerView.
             }
             VIEW_TYPE_USER_IMAGE -> {
                 val imageHolder = holder as SentImageViewHolder
-                imageHolder.messageImage.setImageURI(message.imageUri)
+                // imageUriString을 Uri로 변환하여 이미지 설정
+                message.imageUriString?.let {
+                    imageHolder.messageImage.setImageURI(Uri.parse(it))
+                }
             }
         }
     }
 
     override fun getItemCount(): Int {
         return messageList.size
+    }
+
+    // --- 이 함수가 누락되었습니다 ---
+    fun updateMessages(newMessages: List<Message>) {
+        messageList.clear()
+        messageList.addAll(newMessages)
+        notifyDataSetChanged()
     }
 }

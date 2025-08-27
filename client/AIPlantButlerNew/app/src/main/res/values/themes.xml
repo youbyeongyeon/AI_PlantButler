@@ -1,12 +1,13 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Base.Theme.AIPlantButlerNew" parent="Theme.Material3.DayNight.NoActionBar">
-    </style>
-
-    <style name="Theme.AIPlantButlerNew" parent="Base.Theme.AIPlantButlerNew" />
-
-    <style name="MyBottomAppBar" parent="Widget.Material3.BottomAppBar">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">bottom</item>
+    <style name="Theme.AIPlantButlerNew" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primaryGreen</item>
+        <item name="colorPrimaryVariant">@color/primaryDarkGreen</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/accentGreen</item>
+        <item name="colorSecondaryVariant">@color/primaryDarkGreen</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
 </resources>

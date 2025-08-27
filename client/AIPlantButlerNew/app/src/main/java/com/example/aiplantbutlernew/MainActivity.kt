@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonChat.setOnClickListener {
-            loadFragment(ChatFragment())
+            loadFragment(ChatListFragment()) // ChatFragment 대신 ChatListFragment를 로드
         }
 
         buttonCalendar.setOnClickListener {
