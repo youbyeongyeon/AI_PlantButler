@@ -1,10 +1,29 @@
+# server/Dockerfile
 FROM python:3.10-slim
+
+# 런타임 기본 설정
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY requirements.txt .
+# 빌드에 필요한 패키지(필요 시만 설치)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+  && rm -rf /var/lib/apt/lists/*
+
+# 의존성 먼저 복사 → 캐시 최적화
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# 앱 소스
+COPY app ./app
 
+# 헬스체크 (선택)
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
+  CMD wget -qO- http://127.0.0.1:8000/health || exit 1
+
+EXPOSE 8000
+
+# 운영: 워커 2~4 권장 (코어 수에 맞춰 조절)
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
