@@ -29,7 +29,7 @@ pip install -r requirements.txt
 
 서버 실행:
 
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload
 
 
 브라우저 확인:
