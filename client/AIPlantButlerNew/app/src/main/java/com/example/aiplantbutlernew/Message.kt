@@ -1,20 +1,24 @@
 package com.example.aiplantbutlernew
 
-import android.net.Uri
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-// ... (상수들은 그대로) ...
 const val VIEW_TYPE_USER_TEXT = 1
 const val VIEW_TYPE_BOT_TEXT = 2
 const val VIEW_TYPE_USER_IMAGE = 3
 
-@Entity(tableName = "messages",
-    foreignKeys = [ForeignKey(entity = ChatRoom::class,
+@Entity(
+    tableName = "messages",
+    foreignKeys = [ForeignKey(
+        entity = ChatRoom::class,
         parentColumns = ["id"],
         childColumns = ["roomId"],
-        onDelete = ForeignKey.CASCADE)])
+        onDelete = ForeignKey.CASCADE
+    )],
+    indices = [Index(value = ["roomId"])]
+)
 data class Message(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val roomId: Long, // 어떤 채팅방에 속한 메시지인지
