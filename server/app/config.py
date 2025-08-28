@@ -2,10 +2,12 @@
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import field_validator
+import json
 
 class Settings(BaseSettings):
+    # pydantic v2 방식: model_config만 사용
     model_config = SettingsConfigDict(
-        env_file=".env",            # server 디렉토리 기준
+        env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -34,8 +36,15 @@ class Settings(BaseSettings):
     JWT_EXPIRE_MINUTES: int = 120
 
     # ---- CORS ----
-    # .env에서 JSON 배열(["http://...","http://..."]) 또는 콤마 구분("http://...,http://...") 모두 허용
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+
+    # ---- ML paths ----
+    MODEL_PATH: str = "app/models/plant_disease_model.keras"
+    CARE_GUIDES_PATH: str = "app/data/care_guides.json"
+
+    # ---- OpenAI 모델/엔드포인트 ----
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    OPENAI_BASE_URL: Optional[str] = None
 
     @field_validator("CORS_ORIGINS", mode="before")
     @classmethod
@@ -44,16 +53,13 @@ class Settings(BaseSettings):
             return v
         if isinstance(v, str):
             s = v.strip()
-            # JSON 배열 문자열이면 그대로 파싱 시도
             if s.startswith("[") and s.endswith("]"):
-                import json
                 try:
                     arr = json.loads(s)
                     if isinstance(arr, list):
                         return arr
                 except Exception:
                     pass
-            # 콤마 구분 문자열 처리
             return [x.strip() for x in s.split(",") if x.strip()]
         return v
 
