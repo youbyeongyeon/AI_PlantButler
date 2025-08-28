@@ -8,8 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    // TODO: 실제 서버 베이스 URL로 교체 (끝에 / 필수)
-    private const val BASE_URL = "http://YOUR_SERVER_HOST:PORT/"
+    // 에뮬레이터라면 10.0.2.2:8000, 실제 기기라면 PC IP로 교체
+    private const val BASE_URL = "http://10.0.2.2:8000/"
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
