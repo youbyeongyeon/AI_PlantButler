@@ -32,7 +32,11 @@
                 android:text="--°C"
                 android:textSize="48sp"
                 android:textColor="@android:color/white"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:shadowColor="#40000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"/>
 
             <TextView
                 android:id="@+id/text_view_weather_desc"
@@ -41,7 +45,11 @@
                 android:layout_below="@id/text_view_temp"
                 android:text="날씨 로딩 중..."
                 android:textColor="@android:color/white"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:shadowColor="#40000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"/>
 
             <TextView
                 android:id="@+id/text_view_location"
@@ -52,7 +60,11 @@
                 android:text="위치 찾는 중..."
                 android:drawableStart="@drawable/ic_location"
                 android:drawablePadding="4dp"
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:shadowColor="#40000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"/>
 
             <TextView
                 android:id="@+id/text_view_plant_comment"
@@ -61,7 +73,12 @@
                 android:layout_below="@id/text_view_location"
                 android:layout_marginTop="16dp"
                 android:text="날씨 정보를 바탕으로 식물 관리 팁을 알려드려요."
-                android:textColor="@android:color/white" />
+                android:textColor="@android:color/white"
+                android:shadowColor="#40000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"/>
+
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 
@@ -70,8 +87,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:paddingBottom="80dp"
+        android:background="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/card_weather"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,7 +99,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
-        app:srcCompat="@drawable/ic_add"
+        android:src="@drawable/ic_add"
+        android:contentDescription="새 식물 추가"
+        app:tint="@android:color/white"
+        app:backgroundTint="@color/primaryGreen"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -1,20 +1,17 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    // alias(libs.plugins.google.devtools.ksp) // 필요시 사용
+    id("com.google.devtools.ksp")
 }
 
 android {
     namespace = "com.example.aiplantbutlernew"
-
-    // 안정적으로 먼저 34 사용 (SDK 36 사용 시는 36 SDK 설치 필요)
-    compileSdk = 34
+    compileSdk = 34 // 36은 베타 버전일 수 있으므로 안정 버전인 34로 변경하는 것을 권장합니다.
 
     defaultConfig {
         applicationId = "com.example.aiplantbutlernew"
         minSdk = 24
-        targetSdk = 34
-
+        targetSdk = 34 // compileSdk와 맞춥니다.
         versionCode = 1
         versionName = "1.0"
 
@@ -23,21 +20,20 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
-
-    // AGP 8.x는 JDK 17 권장/요구
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        encoding = "UTF-8"
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = "1.8"
     }
 }
 
@@ -47,14 +43,17 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.splashscreen)
+    implementation(libs.gson)
+    implementation(libs.google.play.services.location)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.security.crypto)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("com.google.android.gms:play-services-location:21.2.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
 }

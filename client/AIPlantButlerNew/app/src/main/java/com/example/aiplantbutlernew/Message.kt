@@ -21,9 +21,9 @@ const val VIEW_TYPE_USER_IMAGE = 3
 )
 data class Message(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val roomId: Long, // 어떤 채팅방에 속한 메시지인지
+    val roomId: Long,
     val text: String?,
-    val imageUriString: String?, // Uri는 String으로 변환하여 저장
+    val imageUriString: String?,
     val viewType: Int,
     val timestamp: Long = System.currentTimeMillis()
 )

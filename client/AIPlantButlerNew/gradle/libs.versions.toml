@@ -1,18 +1,22 @@
 [versions]
-agp = "8.12.1"
+agp = "8.4.1"
 kotlin = "1.9.22"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-appcompat = "1.6.1"
+appcompat = "1.7.0"
 material = "1.12.0"
 activity = "1.9.0"
 constraintlayout = "2.1.4"
-# --- KSP 버전을 Kotlin 버전에 맞게 수정 ---
 ksp = "1.9.22-1.0.17"
 room = "2.6.1"
-
+splashscreen = "1.0.1"
+gson = "2.10.1" # 필요한 경우 최신 버전으로 변경 가능
+location = "21.3.0"
+coroutines = "1.8.0"
+lifecycle = "2.8.1"
+securityCrypto = "1.1.0-alpha06"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -23,14 +27,18 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-# --- Room 라이브러리 버전도 통일 ---
+androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+google-play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "location" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-# --- KSP 플러그인 정보 추가 ---
 google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
