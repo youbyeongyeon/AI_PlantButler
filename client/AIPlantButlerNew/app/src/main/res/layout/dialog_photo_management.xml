@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/text_view_dialog_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사진 관리"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="12dp"/>
+
+    <TextView
+        android:id="@+id/text_view_dialog_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="사진을 터치하여 순서를 정하세요."
+        android:paddingHorizontal="24dp"
+        android:layout_marginBottom="8dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_photos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"/>
+
+</LinearLayout>
