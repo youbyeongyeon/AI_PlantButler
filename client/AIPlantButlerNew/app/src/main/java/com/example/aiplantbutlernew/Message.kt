@@ -5,9 +5,10 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-const val VIEW_TYPE_USER_TEXT = 1
-const val VIEW_TYPE_BOT_TEXT = 2
-const val VIEW_TYPE_USER_IMAGE = 3
+const val VIEW_TYPE_USER_TEXT = 0
+const val VIEW_TYPE_USER_IMAGE = 1
+const val VIEW_TYPE_BOT_TEXT  = 2
+const val VIEW_TYPE_BOT_IMAGE = 3
 
 @Entity(
     tableName = "messages",
