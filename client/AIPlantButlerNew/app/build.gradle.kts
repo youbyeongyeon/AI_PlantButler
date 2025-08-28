@@ -20,7 +20,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -48,12 +48,14 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation("androidx.security:security-crypto:1.0.0")
 
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
     implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")

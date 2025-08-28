@@ -21,6 +21,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.Gson
@@ -31,53 +33,37 @@ import kotlinx.coroutines.withContext
 import java.net.URL
 
 // --- 데이터 클래스 정의 ---
-
-// 할 일 하나를 나타내는 데이터 클래스 (isDone: true=활성화, false=비활성화)
 data class Task(val description: String, var isDone: Boolean = false, var alarmTime: Long? = null)
-
-// 식물 데이터 클래스
-data class Plant(
-    val name: String,
-    val imageUriString: String,
-    val tasks: MutableList<Task> = mutableListOf()
-)
-
-// OpenWeatherMap API 응답을 위한 데이터 클래스들
+data class Plant(val name: String, val imageUriString: String, val tasks: MutableList<Task> = mutableListOf())
 data class WeatherResponse(val weather: List<Weather>, val main: Main, val name: String)
 data class Weather(val id: Int, val main: String, val description: String, val icon: String)
 data class Main(val temp: Double)
 
 
 // --- RecyclerView 어댑터 정의 ---
-
 class PlantAdapter(
     private val plantList: List<Plant>,
     private val listener: OnItemClickListener
 ) : RecyclerView.Adapter<PlantAdapter.PlantViewHolder>() {
-
+    // ... (Adapter 코드는 이전과 동일) ...
     interface OnItemClickListener {
         fun onItemClick(position: Int)
         fun onDeleteClick(position: Int)
     }
-
     class PlantViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val plantPhoto: ImageView = itemView.findViewById(R.id.image_view_plant_photo)
         val plantName: TextView = itemView.findViewById(R.id.text_view_plant_name)
         val manageButton: ImageButton = itemView.findViewById(R.id.button_manage_plant)
         val taskSummary: TextView = itemView.findViewById(R.id.text_view_task_subtitle)
     }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlantViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_plant_task, parent, false)
         return PlantViewHolder(view)
     }
-
     override fun onBindViewHolder(holder: PlantViewHolder, position: Int) {
         val plant = plantList[position]
         holder.plantName.text = plant.name
         holder.plantPhoto.setImageURI(Uri.parse(plant.imageUriString))
-
-        // 체크된(활성화된) 할 일 중에서 가장 첫 번째 것을 찾습니다.
         val nextCheckedTask = plant.tasks.firstOrNull { it.isDone }
         if (nextCheckedTask != null) {
             holder.taskSummary.text = "할 일: ${nextCheckedTask.description}"
@@ -86,11 +72,9 @@ class PlantAdapter(
             holder.taskSummary.text = "활성화된 할 일이 없습니다."
             holder.taskSummary.visibility = View.VISIBLE
         }
-
         holder.manageButton.setOnClickListener { listener.onDeleteClick(position) }
         holder.itemView.setOnClickListener { listener.onItemClick(position) }
     }
-
     override fun getItemCount() = plantList.size
 }
 
@@ -105,6 +89,7 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
     private lateinit var textViewLocation: TextView
     private lateinit var textViewPlantComment: TextView
 
+    // ... (런처들은 이전과 동일) ...
     private val addPlantLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val plantName = result.data?.getStringExtra("plantName")
@@ -117,7 +102,6 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
             }
         }
     }
-
     private val plantDetailLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val position = result.data?.getIntExtra("plantPosition", -1)
@@ -129,10 +113,10 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
             }
         }
     }
-
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) { fetchLocationAndWeather() } else { textViewPlantComment.text = "위치 권한을 허용해야 날씨 정보를 볼 수 있어요." }
     }
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_home, container, false)
@@ -183,7 +167,14 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
     }
 
     private fun savePlants() {
-        val sharedPref = activity?.getSharedPreferences("my_plants", Context.MODE_PRIVATE) ?: return
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        val sharedPref = EncryptedSharedPreferences.create(
+            "secret_my_plants",
+            masterKeyAlias,
+            requireContext(),
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
         val editor = sharedPref.edit()
         val json = Gson().toJson(plantList)
         editor.putString("plant_list", json)
@@ -191,21 +182,33 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
     }
 
     private fun loadPlants() {
-        val sharedPref = activity?.getSharedPreferences("my_plants", Context.MODE_PRIVATE) ?: return
-        val json = sharedPref.getString("plant_list", null)
-        if (json != null) {
-            try {
+        // --- 이 함수 전체가 수정되었습니다 ---
+        try {
+            val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+            val sharedPref = EncryptedSharedPreferences.create(
+                "secret_my_plants", // 저장할 때 사용한 '비밀 금고' 이름과 동일해야 합니다.
+                masterKeyAlias,
+                requireContext(),
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+
+            val json = sharedPref.getString("plant_list", null)
+            if (json != null) {
                 val type = object : TypeToken<MutableList<Plant>>() {}.type
                 val loadedPlants: MutableList<Plant> = Gson().fromJson(json, type)
                 plantList.clear()
                 plantList.addAll(loadedPlants)
-            } catch (e: Exception) {
-                plantList.clear()
-                savePlants()
             }
+        } catch (e: Exception) {
+            // 암호화된 파일 읽기 실패 또는 데이터 형식 오류 시, 데이터를 초기화합니다.
+            e.printStackTrace()
+            plantList.clear()
+            savePlants() // 깨끗한 상태로 다시 저장
         }
     }
 
+    // ... (날씨 관련 함수들은 이전과 동일) ...
     private fun checkLocationPermission() {
         when {
             ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED -> {
@@ -226,7 +229,7 @@ class HomeFragment : Fragment(), PlantAdapter.OnItemClickListener {
                 val lon = location.longitude
                 viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
                     try {
-                        val apiKey = "388dcec3097a775ed8a28ff805e223fd" // <--- 이 부분을 꼭 확인하세요!
+                        val apiKey = "388dcec3097a775ed8a28ff805e223fd"
                         val url = "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=$apiKey&units=metric&lang=kr"
                         val json = URL(url).readText()
                         val weatherResponse = Gson().fromJson(json, WeatherResponse::class.java)

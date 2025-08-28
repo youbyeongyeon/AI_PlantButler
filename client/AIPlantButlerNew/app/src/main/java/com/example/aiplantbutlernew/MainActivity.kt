@@ -3,12 +3,18 @@ package com.example.aiplantbutlernew
 import android.os.Bundle
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // --- 이 부분을 추가하세요 ---
+        // setContentView 이전에 호출되어야 합니다.
+        installSplashScreen()
+        // ------------------------
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -21,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         buttonChat.setOnClickListener {
-            loadFragment(ChatListFragment()) // ChatFragment 대신 ChatListFragment를 로드
+            loadFragment(ChatListFragment())
         }
 
         buttonCalendar.setOnClickListener {
