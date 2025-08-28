@@ -1,5 +1,6 @@
 # server/app/services/vision_openai.py
-import base64
+import base64, json, time
+from fastapi import HTTPException
 from openai import OpenAI
 from app.config import settings
 
@@ -11,22 +12,40 @@ SYSTEM_PROMPT = """당신은 식물 질병 진단 보조모델입니다.
 모르면 {"plant":"unknown","disease":"unknown","confidence":0.0}로.
 """
 
+def _img_b64(image_bytes: bytes) -> str:
+    return "data:image/jpeg;base64," + base64.b64encode(image_bytes).decode("utf-8")
+
 async def analyze_image(image_bytes: bytes):
-    b64 = base64.b64encode(image_bytes).decode("utf-8")
-    # 모델 이름은 계정에서 사용 가능한 비전 모델로 교체 (예: gpt-4o, gpt-4o-mini)
-    resp = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role":"system","content":SYSTEM_PROMPT},
-            {"role":"user","content":[
-                {"type":"input_text","text":"이 사진을 분석해 주세요."},
-                {"type":"input_image","image_url": f"data:image/jpeg;base64,{b64}"}
-            ]}
-        ],
-        temperature=0.2,
-    )
-    txt = resp.choices[0].message.content
-    # 간단 파싱(실서비스는 json.loads try/except, 정규화)
-    import json
-    data = json.loads(txt)
-    return data.get("plant","unknown"), data.get("disease","unknown"), float(data.get("confidence",0.0))
+    img_url = _img_b64(image_bytes)
+
+    # 간단 재시도(429 대비)
+    for attempt in range(3):
+        try:
+            resp = client.chat.completions.create(
+                model="gpt-4o",  # 비전 입력 지원 모델이어야 함
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {"role": "user", "content": [
+                        {"type": "text", "text": "이 사진의 작물/증상/의심 병명을 추론하고 JSON으로만 답하세요."},
+                        {"type": "image_url", "image_url": {"url": img_url}}
+                    ]},
+                ],
+                temperature=0.2,
+                max_tokens=300,
+            )
+            txt = resp.choices[0].message.content
+            data = json.loads(txt)
+            return (
+                data.get("plant", "unknown"),
+                data.get("disease", "unknown"),
+                float(data.get("confidence", 0.0)),
+            )
+        except Exception as e:
+            # 429 쿼터/레이트 제한이면 짧게 대기 후 재시도
+            if "429" in str(e) or "insufficient_quota" in str(e):
+                time.sleep(1.5 * (attempt + 1))
+                continue
+            raise
+
+    # 여기까지 오면 레이트/쿼터 문제 지속
+    raise HTTPException(status_code=503, detail="Upstream model rate-limited or quota exhausted.")

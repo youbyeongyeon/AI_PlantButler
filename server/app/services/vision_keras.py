@@ -1,44 +1,59 @@
-# Keras 모델 로드 & 추론
+# server/app/services/vision_keras.py
+from __future__ import annotations
 from typing import Tuple
+import io
 import numpy as np
 from PIL import Image
-import io
 
-# Keras 3 (tf.keras와 호환)
 from keras.models import load_model
+import threading
 
-# 1) 서버 시작 때 1회 로드(가장 중요: 전역 싱글톤)
-MODEL = load_model("models/plant_disease_model.keras")  # 경로 맞추기
-INPUT_SIZE = (224, 224)  # 학습 시 사용한 입력 크기로 교체
+# ===== 경로/하이퍼파라미터 (학습 시와 동일하게 맞추세요) =====
+MODEL_PATH = "models/plant_disease_detector.keras"
+INPUT_SIZE = (224, 224)  # 학습할 때의 입력 크기로 교체
 CLASS_NAMES = [
+    # 학습 클래스 순서대로 정확히 채우세요
     "healthy",
     "late_blight",
     "powdery_mildew",
-    "leaf_spot",
-]  # 학습 클래스 순서대로
+    "leaf_spot"
+]
+
+# ===== 모델 로드 (앱 시작 시 1회) =====
+_model = None
+_model_lock = threading.Lock()
+
+def _get_model():
+    global _model
+    if _model is None:
+        with _model_lock:
+            if _model is None:
+                _model = load_model(MODEL_PATH)
+                # 워밍업(콜드스타트 방지)
+                dummy = np.zeros((1, INPUT_SIZE[0], INPUT_SIZE[1], 3), dtype=np.float32)
+                _model.predict(dummy)
+    return _model
 
 def _preprocess(img_bytes: bytes) -> np.ndarray:
-    # PIL로 열기 → 리사이즈 → [0,1] 정규화 → NCHW/ NHWC 확인(보통 NHWC)
     img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
     img = img.resize(INPUT_SIZE)
-    arr = np.array(img).astype(np.float32) / 255.0
+    arr = np.asarray(img, dtype=np.float32) / 255.0
     arr = np.expand_dims(arr, axis=0)  # (1, H, W, 3)
     return arr
 
-def _postprocess(prob: np.ndarray) -> Tuple[str, float]:
-    # prob: (1, num_classes) softmax라고 가정
-    idx = int(np.argmax(prob, axis=1)[0])
-    return CLASS_NAMES[idx], float(prob[0, idx])
+def _postprocess(pred: np.ndarray) -> Tuple[str, float]:
+    # pred: (1, C) softmax 가정
+    idx = int(np.argmax(pred, axis=1)[0])
+    return CLASS_NAMES[idx], float(pred[0, idx])
 
 async def analyze_image_with_keras(img_bytes: bytes) -> tuple[str, str, float]:
     """
     반환: (plant, disease, confidence)
-    plant는 모르면 "unknown"으로 두고, disease만 분류하는 경우가 많음
+    plant 분류 모델이 따로 없다면 'unknown' 유지
     """
     x = _preprocess(img_bytes)
-    pred = MODEL.predict(x)  # (1, C)
+    model = _get_model()
+    pred = model.predict(x)
     disease, conf = _postprocess(pred)
-
-    # 필요하면 plant 분류 모델을 따로 두거나, 하나의 모델에서 멀티헤드로 출력
     plant = "unknown"
     return plant, disease, conf
