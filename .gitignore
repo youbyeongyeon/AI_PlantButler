@@ -1,59 +1,42 @@
-# ==========================
-# Android / Gradle
-# ==========================
+# --- Android/Gradle ---
+*.iml
 .gradle/
 build/
 captures/
 .externalNativeBuild/
 .cxx/
-*.aab
-*.apk
-output-metadata.json
-local.properties
 
-# IntelliJ / Android Studio
-*.iml
+# Android Studio/IntelliJ
 .idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
+.DS_Store
+local.properties
+output-metadata.json
 
 # Keystore files
 *.jks
 *.keystore
 
-# ==========================
-# Python / FastAPI
-# ==========================
+# Build outputs
+*.apk
+*.ap_
+*.aab
+
+# Profiling
+*.hprof
+
+# --- Python/Server ---
+venv/
 __pycache__/
-*.py[cod]
+*.pyc
 *.pyo
 *.pyd
-
-# Virtual environments
-venv/
-server/venv/
-
-# Model & large artifacts (use Git LFS or external storage)
-*.keras
-*.h5
-*.ckpt
-*.pb
-*.tflite
-
-# ==========================
-# Logs / OS / Misc
-# ==========================
+*.sqlite3
 *.log
-*.hprof
-.DS_Store
 
-# ==========================
-# Config / Secrets
-# ==========================
+# --- dotenv (환경 변수) ---
 .env
 .env.*
 !.env.example
 
-# Google Services
-google-services.json
+# --- OS ---
+Thumbs.db
