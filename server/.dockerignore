@@ -1,0 +1,13 @@
+# 빌드 컨텍스트 최소화 & 비밀 보호
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.vscode/
+.idea/
+tests/

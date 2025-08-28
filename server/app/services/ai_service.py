@@ -11,3 +11,4 @@ def analyze_plant_image(image_bytes: bytes):
         "confidence": 0.95,
         "advice": "Keep watering regularly"
     }
+

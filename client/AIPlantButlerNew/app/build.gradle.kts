@@ -1,17 +1,20 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id("com.google.devtools.ksp")
+    // alias(libs.plugins.google.devtools.ksp) // 필요시 사용
 }
 
 android {
     namespace = "com.example.aiplantbutlernew"
-    compileSdk = 36
+
+    // 안정적으로 먼저 34 사용 (SDK 36 사용 시는 36 SDK 설치 필요)
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.aiplantbutlernew"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
+
         versionCode = 1
         versionName = "1.0"
 
@@ -20,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -28,14 +31,13 @@ android {
         }
     }
 
-    // compileOptions 블록은 defaultConfig 밖, android 블록 바로 안에 있어야 합니다.
+    // AGP 8.x는 JDK 17 권장/요구
     compileOptions {
-        encoding = "UTF-8" // 한글 인코딩 설정도 추가하는 것이 좋습니다.
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 }
 
@@ -45,20 +47,14 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation("androidx.security:security-crypto:1.0.0")
 
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.google.android.gms:play-services-location:21.2.0")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    implementation("androidx.core:core-splashscreen:1.0.1")
-
-    val room_version = "2.6.1"
-    implementation("androidx.room:room-runtime:$room_version")
-    ksp("androidx.room:room-compiler:$room_version")
-    implementation("androidx.room:room-ktx:$room_version")
 }
